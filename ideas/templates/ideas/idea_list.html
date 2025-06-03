@@ -1,0 +1,36 @@
+{% extends "ideas/base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        blablablabla
+        <a href="{% url 'idea_create' %}" class="btn btn-primary mb-3">
+            <i class="fa-solid fa-plus"></i> Ajouter une idée
+        </a>
+    </div>
+
+    <div class="col-md-9">
+        {% for ideas in object_list %}
+            <div class="card mt-3">
+                <div class="card-header">Idée #{{ ideas.pk }}</div>
+                
+                <div class="card-body">
+                    <div class="badge rounded-pill text-bg-primary">{{ ideas.get_status_display }}</div>
+                    <h5 class="card-title">{{ ideas.title }}</h5>
+                    <p>{{ ideas.description }}</p>
+                    <p><small class="text-muted">Créé le {{ ideas.created_at }}</small></p>
+                </div>
+                <div class="card-footer">
+                    <i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments.count }} | <i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }} | <i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}
+                </div>
+            </div>
+        {% empty %}
+            Pas d'idées pour le moment.
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock%}
