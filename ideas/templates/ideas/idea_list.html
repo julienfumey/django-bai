@@ -23,7 +23,7 @@
                     <p><small class="text-muted">Créé le {{ ideas.created_at }}</small></p>
                 </div>
                 <div class="card-footer">
-                    <i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments.count }} | <i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }} | <i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}
+                    <i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments.count }} | <a href="" class="upvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }}</a> | <a href="" class="downvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}</a>
                 </div>
             </div>
         {% empty %}
@@ -32,5 +32,54 @@
     </div>
 </div>
 
+
+<script>
+    const upvotes = document.querySelectorAll('.upvote');
+
+    upvotes.forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ideaId = this.id;
+            console.log(ideaId);
+            fetch(`/idea/${ideaId}/up`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = "<i class=\"fa-solid fa-thumbs-up text-success\"></i> "+data.upvote;
+            });
+        });
+
+    });
+
+
+    const downvotes = document.querySelectorAll('.downvote');
+
+    downvotes.forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ideaId = this.id;
+            console.log(ideaId);
+            fetch(`/idea/${ideaId}/down`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = "<i class=\"fa-solid fa-thumbs-down text-danger\"></i> "+data.downvote;
+            });
+        });
+
+    });
+</script>
 
 {% endblock%}

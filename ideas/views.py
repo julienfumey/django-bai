@@ -17,13 +17,13 @@ class IdeaListView(ListView):
 def idea_upvote(request, pk):
     idea = models.Idea.objects.get(pk=pk)
     idea.upvote()
-    JsonResponse({"upvote": idea.upvotes})
+    return JsonResponse({"upvote": idea.upvotes})
 
 
 def idea_downvote(request, pk):
     idea = models.Idea.objects.get(pk=pk)
     idea.downvote()
-    JsonResponse({"upvote": idea.upvotes})
+    return JsonResponse({"downvote": idea.downvotes})
 
 
 class IdeaDetailView(DetailView):
