@@ -18,7 +18,7 @@
                 
                 <div class="card-body">
                     <div class="badge rounded-pill text-bg-primary">{{ ideas.get_status_display }}</div>
-                    <h5 class="card-title">{{ ideas.title }}</h5>
+                    <h5 class="card-title"><a href="{% url 'idea_detail' pk=ideas.pk %}">{{ ideas.title }}</a></h5>
                     <p>{{ ideas.description }}</p>
                     <p><small class="text-muted">Créé le {{ ideas.created_at }}</small></p>
                 </div>
