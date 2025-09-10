@@ -66,6 +66,13 @@ class Comment(models.Model):
     downvotes = models.PositiveIntegerField(
         default=0,
     )
+    answer_to = models.ForeignKey(
+        'self',
+        related_name='replies',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f'Comment on {self.idea.title} by {self.created_at}'

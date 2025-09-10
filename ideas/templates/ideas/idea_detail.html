@@ -13,10 +13,12 @@
 <h4>Commentaires ({{ idea.comments.count }})</h4>
 
 {% for comment in idea.comments.all %}
-    <div class="card mb-3">
+    <div class="card mb-3 comment" id="comment-{{ comment.pk }}">
         <div class="card-body">
             <p>{{ comment.content|safe }}</p>
-            <p><small class="text-muted">Créé le {{ comment.created_at }}</small></p>
+            <p><small class="text-muted">Créé le {{ comment.created_at }}</small><a href="">&nbsp;Répondre</a></p>
+        </div>
+        <div class="answer-form">
         </div>
     </div>
 {% empty %}
@@ -28,5 +30,11 @@
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Ajouter un commentaire</button>
 </form>
+
+
+<script>
+comment = document.querySelectorAll('');
+
+</script>
 
 {% endblock %}
