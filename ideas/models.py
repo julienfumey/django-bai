@@ -1,4 +1,6 @@
 from django.db import models
+from .utils import send_mail_signalement
+from django.contrib.auth.decorators import login_required
 
 # Create your models here.
 
@@ -34,6 +36,9 @@ class Idea(models.Model):
         choices=STATUSES,
         default=0,
     )
+    signal = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         return self.title
@@ -44,6 +49,20 @@ class Idea(models.Model):
 
     def downvote(self):
         self.downvotes += 1
+        self.save()
+
+    def signaler(self):
+        if self.signal == False:
+            send_mail_signalement(self)
+            self.signal = True
+            self.save()
+        else:
+            pass
+
+    @login_required
+    def mark_as_answered(self, answer_text):
+        self.answer = answer_text
+        self.status = 1
         self.save()
 
 
@@ -73,6 +92,25 @@ class Comment(models.Model):
         blank=True,
         null=True,
     )
+    signal = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         return f'Comment on {self.idea.title} by {self.created_at}'
+
+    def upvote(self):
+        self.upvotes += 1
+        self.save()
+
+    def downvote(self):
+        self.downvotes += 1
+        self.save()
+
+    def signaler(self):
+        if self.signal == False:
+            send_mail_signalement(self)
+            self.signal = True
+            self.save()
+        else:
+            pass
