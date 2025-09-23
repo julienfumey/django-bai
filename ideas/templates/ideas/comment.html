@@ -1,17 +1,17 @@
-<div class="px-5">
+<div class="px-5 border my-3">
     <div class="comment-container">
         {{ c.content|safe }}
     </div>
-    <p><small class="text-muted">{{ c.created_at|date:'d M Y H:m:s' }}</small></p>
+    <p><small class="text-muted">{{ c.created_at|date:'d M Y H:m:s' }}&nbsp;|&nbsp;<a href="" class="upvote" id="{{c.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ c.upvotes }}</a>&nbsp;|&nbsp;<a href="" class="downvote" id="{{c.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ c.downvotes }}</a>&nbsp;</small>&nbsp;|&nbsp;<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="comment" data-bs-id="{{ c.pk }}">Report</a>&nbsp;|&nbsp;<a class="reply-btn" href="" data-type="comment" data-id="{{ c.pk }}">Répondre</a></p>
 
-    <button class="reply-btn" data-type="comment" data-id="{{ c.pk }}">Répondre</button>
+    
 
     <form id="comment-form-{{ c.pk }}" class="comment-form" method="POST">
         {% csrf_token %}
-        <input type="hidden" name="{{ form.answer_to_id.name }}" id="{{ form.answer_to_id.id_for_label }}" value="{{ c.pk }}">
+        <input type="hidden" name="{{ comment_form.answer_to_id.name }}" id="{{ comment_form.answer_to_id.id_for_label }}" value="{{ c.pk }}">
 
-        <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
-        {{ form.content }}
+        <label for="{{ comment_form.content.id_for_label }}">{{ comment_form.content.label }}</label>
+        {{ comment_form.content }}
         <button type="submit">Envoyer</button>
     </form>
 

@@ -3,8 +3,18 @@
 {% block title %}Visualisation d'une idée{% endblock %}
 
 {% block content %}
-<h5>Idée #{{ idea.pk }}</h5>
-<h2>{{ idea.title }}</h2>
+<div class="row">
+    <div class="col-md-7">   
+        <h5>Idée #{{ idea.pk }}</h5>
+        <h2>{{ idea.title }} <div class="badge rounded-pill text-bg-primary">{{ idea.get_status_display }}</div></h2>
+
+        <div>Créée le {{ idea.created_at|date:'d M Y H:m:s' }}</div>
+        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ idea.comments.count }} | <a href="" class="upvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ idea.upvotes }}</a> | <a href="" class="downvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ idea.downvotes }}</a>&nbsp;|&nbsp;<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ idea.pk }}">Report</a></div>
+    </div>
+
+    <div class="col-md-5">
+         </div>
+</div>
 
 <div class="container-fluid vh-100">
     <div class="row h-100">
@@ -21,11 +31,9 @@
 
             <form id="comment-form-ARTICLE" class="comment-form" method="POST">
                 {% csrf_token %}
-                <input type="hidden" name="{{ form.answer_to_id.name }}" id="{{ form.answer_to_id.id_for_label }}" value="{{ c.pk }}">
-
-                <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
-                {{ form.content }}
-                <button type="submit">Envoyer</button>
+                <label for="{{ comment_form.content.id_for_label }}">{{ comment_form.content.label }}</label>
+                {{ comment_form.content }}
+                <button type="submit" name="comment_submit">Envoyer</button>
             </form>
 
             {% for comment in idea.comments.all %}
@@ -40,9 +48,46 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <form method="POST">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="reportModalLabel">Report a post</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="{{ report_form.type_.name}}" id="{{ report_form.type_.id_for_label }}" value="">
+                    <input type="hidden" name="{{ report_form.id_.name }}" id="{{ report_form.id_.id_for_label }}" value="">
+                    
+                    <label for="{{ report_form.reason.id_for_label }}">Reason</label>
+                    {{ report_form.reason }}
+
+                    <label for="{{ report_form.comment.id_for_label }}">Details (optional)</label>
+                    {{ report_form.comment }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-grey" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="report_submit" class="btn btn-red">Send report</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
 <script>
     
     document.addEventListener("DOMContentLoaded", function () {
+        const answer_links = document.querySelectorAll(".reply-btn");
+
+        answer_links.forEach(link => {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+            });
+        });
+
         const forms = document.querySelectorAll(".comment-form");
         forms.forEach(f => f.style.display = "none"); // On cache le formulaire au départ
 
@@ -78,6 +123,52 @@
         });
     });
 
+    const upvotes = document.querySelectorAll('.upvote');
+
+    upvotes.forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ideaId = this.id;
+            console.log(ideaId);
+            fetch(`/comment/${ideaId}/up`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = "<i class=\"fa-solid fa-thumbs-up text-success\"></i> "+data.upvote;
+            });
+        });
+
+    });
+
+
+    const downvotes = document.querySelectorAll('.downvote');
+
+    downvotes.forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ideaId = this.id;
+            console.log(ideaId);
+            fetch(`/comment/${ideaId}/down`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = "<i class=\"fa-solid fa-thumbs-down text-danger\"></i> "+data.downvote;
+            });
+        });
+
+    });
 </script>
 
 {% endblock %}
