@@ -1,0 +1,34 @@
+// 1. Fonctions Bootstrap
+@import "../../node_modules/bootstrap/scss/functions";
+
+// 2. Variables (déjà présentes dans Bootstrap)
+@import "../../node_modules/bootstrap/scss/variables";
+
+
+// Custom styles
+$darkblue: #1D1B39;
+$lightblue: #5960A3;
+$red: #AA1D3E;
+$grey: #B0ADB3;
+$lightgrey: #FCFCFF;
+
+
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "darkblue": $darkblue,
+    "lightblue": $lightblue,
+    "red": $red,
+    "grey": $grey,
+    "lightgrey": $lightgrey
+  )
+);
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+
+
+//  "darkblue": $darkblue,
+//     "lightblue": $lightblue,
+//     "red": $red,
+//     "grey": $grey

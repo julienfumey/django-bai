@@ -13,6 +13,31 @@ from . import forms
 class IdeaListView(ListView):
     model = models.Idea
     template_name = 'ideas/idea_list.html'
+    form_class = forms.ReportForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form_class
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            reason = form.cleaned_data['reason']
+            commentaire = form.cleaned_data['comment']
+            type_ = form.cleaned_data['type_']
+            id_ = form.cleaned_data['id_']
+            if type_ == 'idea':
+                print("toto")
+                idea = models.Idea.objects.get(pk=id_)
+                idea.signaler(reason, commentaire)
+            elif type_ == 'comment':
+                comment = models.Comment.objects.get(pk=id_)
+                comment.signaler(reason, commentaire)
+            return redirect(self.request.path)
+        else:
+            print(form.errors)
+        return self.get(self, request, *args, **kwargs)
 
 
 def idea_upvote(request, pk):
@@ -27,27 +52,30 @@ def idea_downvote(request, pk):
     return JsonResponse({"downvote": idea.downvotes})
 
 
-class IdeaDetailView(FormMixin, DetailView):
+class IdeaDetailView(DetailView):
     model = models.Idea
     template_name = 'ideas/idea_detail.html'
-    form_class = forms.CommentForm
+    context_object_name = "idea"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if "form" not in context:
-            context["form"] = self.get_form()
+        context["comment_form"] = forms.CommentForm
+        context["answer_form"] = forms.AnswerForm
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()  # récupérer l'article
-        form = self.get_form()
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.idea = self.object  # lier au modèle principal
-            comment.save()
-            return redirect('idea_detail', pk=self.object.pk)
-        else:
-            return self.form_invalid(form)
+
+        if "submit_comment" in request.POST:
+            comment_form = forms.CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.idea = self.object  # lier au modèle principal
+                comment.save()
+                return redirect('idea_detail', pk=self.object.pk)
+
+        return self.get(self, request, *args, **kwargs)
+        # answer_form = self.get_form()
 
 
 class IdeaCreateView(CreateView):

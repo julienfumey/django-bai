@@ -6,34 +6,36 @@
 <h5>Idée #{{ idea.pk }}</h5>
 <h2>{{ idea.title }}</h2>
 
-{{ idea.description|safe }}
-
-<hr>
-
-<h4>Commentaires ({{ idea.comments.count }})</h4>
-
-{% for comment in idea.comments.all %}
-    <div class="card mb-3 comment" id="comment-{{ comment.pk }}">
-        <div class="card-body">
-            <p>{{ comment.content|safe }}</p>
-            <p><small class="text-muted">Créé le {{ comment.created_at }}</small><a href="">&nbsp;Répondre</a></p>
+<div class="container-fluid vh-100">
+    <div class="row h-100">
+        <div class="col-md-7 h-100">
+            {{ idea.description|safe }}
         </div>
-        <div class="answer-form">
+
+
+        <div class="col-md-5 h-100 overflow-auto">
+
+            <h4>Commentaires ({{ idea.comments.count }})</h4>
+
+            {% for comment in idea.comments.all %}
+                {% include 'ideas/comment.html' with c=comment %}
+            {% empty %}
+                Pas de commentaires pour le moment.
+            {% endfor %}
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Ajouter un commentaire</button>
+            </form>
+
         </div>
     </div>
-{% empty %}
-    Pas de commentaires pour le moment.
-{% endfor %}
-
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Ajouter un commentaire</button>
-</form>
-
+</div>
 
 <script>
-comment = document.querySelectorAll('');
+comment = document.querySelectorAll('.reply-link');
+
 
 </script>
 

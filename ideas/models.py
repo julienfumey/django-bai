@@ -1,6 +1,7 @@
 from django.db import models
 from .utils import send_mail_signalement
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
 # Create your models here.
 
@@ -43,6 +44,9 @@ class Idea(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('idea_detail', args=[str(self.pk)])
+
     def upvote(self):
         self.upvotes += 1
         self.save()
@@ -51,9 +55,9 @@ class Idea(models.Model):
         self.downvotes += 1
         self.save()
 
-    def signaler(self):
+    def signaler(self, reason, commentaire):
         if self.signal == False:
-            send_mail_signalement(self)
+            send_mail_signalement(self, reason, commentaire)
             self.signal = True
             self.save()
         else:
@@ -107,9 +111,9 @@ class Comment(models.Model):
         self.downvotes += 1
         self.save()
 
-    def signaler(self):
+    def signaler(self, reason, commentaire):
         if self.signal == False:
-            send_mail_signalement(self)
+            send_mail_signalement(self, reason, commentaire)
             self.signal = True
             self.save()
         else:

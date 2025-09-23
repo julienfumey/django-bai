@@ -1,0 +1,15 @@
+{% autoescape off %}
+Bonjour,
+
+Un signalement a été effectué sur la boîte à idées.
+
+Le signalement concerne {% if type_objet == "Comment" %}un commentaire{% else %}une idée{% endif %} :
+Identifiant : {{ object.pk }}
+Adresse : {{ object.get_absolute_url }}
+
+Raison du signalement : {{ reason }}
+Commentaire (optionnel) : {{ commentaire }}
+
+Ce mail a été envoyé automatiquement par le système de la boîte à idées. Merci de ne pas y répondre.
+
+{% endautoescape%}
