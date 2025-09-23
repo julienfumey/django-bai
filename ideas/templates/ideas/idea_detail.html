@@ -17,25 +17,66 @@
 
             <h4>Commentaires ({{ idea.comments.count }})</h4>
 
+            <button class="reply-btn" data-type="article">Répondre</button>
+
+            <form id="comment-form-ARTICLE" class="comment-form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="{{ form.answer_to_id.name }}" id="{{ form.answer_to_id.id_for_label }}" value="{{ c.pk }}">
+
+                <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+                {{ form.content }}
+                <button type="submit">Envoyer</button>
+            </form>
+
             {% for comment in idea.comments.all %}
-                {% include 'ideas/comment.html' with c=comment %}
+                {% if not comment.answer_to %}
+                    {% include 'ideas/comment.html' with c=comment %}
+                {% endif %}
             {% empty %}
                 Pas de commentaires pour le moment.
             {% endfor %}
-
-            <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Ajouter un commentaire</button>
-            </form>
 
         </div>
     </div>
 </div>
 
 <script>
-comment = document.querySelectorAll('.reply-link');
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        const forms = document.querySelectorAll(".comment-form");
+        forms.forEach(f => f.style.display = "none"); // On cache le formulaire au départ
 
+        document.querySelectorAll(".reply-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let id = "ARTICLE";
+                if (this.dataset.type === "comment"){
+                    id = this.dataset.id;
+                }
+
+                // Cacher tous les formulaires
+                forms.forEach(f => f.style.display = "none");
+
+                // Montrer le formulaire associé
+                const targetForm = document.getElementById("comment-form-" + id);
+                if (targetForm) {
+                    targetForm.style.display = "block";
+                    targetForm.querySelector("textarea").focus();
+                }
+            });
+        });
+
+        document.querySelectorAll("textarea").forEach(function (textarea) {
+            // Ajuste à l'init si du texte est déjà présent
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+
+            // Ajuste à chaque frappe
+            textarea.addEventListener("input", function () {
+                this.style.height = "auto";
+                this.style.height = this.scrollHeight + "px";
+            });
+        });
+    });
 
 </script>
 

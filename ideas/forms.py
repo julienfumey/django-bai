@@ -2,10 +2,21 @@ from django import forms
 from . import models
 
 
-class CommentForm(forms.ModelForm):
-    class Meta:
-        model = models.Comment
-        fields = ['content']
+class CommentForm(forms.Form):
+    content = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control',
+                'rows': 1,
+                'style': 'overflow:hidden; resize:none;',
+            },
+        ),
+        label="Ajouter un commentaire",
+    )
+    answer_to_id = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
 
 
 class AnswerForm(forms.ModelForm):

@@ -56,23 +56,26 @@ class IdeaDetailView(DetailView):
     model = models.Idea
     template_name = 'ideas/idea_detail.html'
     context_object_name = "idea"
+    form_class = forms.CommentForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["comment_form"] = forms.CommentForm
-        context["answer_form"] = forms.AnswerForm
+        context["form"] = self.form_class
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()  # récupérer l'article
 
-        if "submit_comment" in request.POST:
-            comment_form = forms.CommentForm(request.POST)
-            if comment_form.is_valid():
-                comment = comment_form.save(commit=False)
-                comment.idea = self.object  # lier au modèle principal
-                comment.save()
-                return redirect('idea_detail', pk=self.object.pk)
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            comment = models.Comment(idea=self.object, content=form.cleaned_data['content'])
+
+            if 'answer_to_id' in form.cleaned_data:
+                answer_to = models.Comment.objects.get(pk=form.cleaned_data['answer_to_id'])
+
+                comment.answer_to = answer_to
+            comment.save()
+            return redirect('idea_detail', pk=self.object.pk)
 
         return self.get(self, request, *args, **kwargs)
         # answer_form = self.get_form()

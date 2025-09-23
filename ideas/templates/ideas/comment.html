@@ -4,19 +4,22 @@
     </div>
     <p><small class="text-muted">{{ c.created_at|date:'d M Y H:m:s' }}</small></p>
 
+    <button class="reply-btn" data-type="comment" data-id="{{ c.pk }}">Répondre</button>
+
+    <form id="comment-form-{{ c.pk }}" class="comment-form" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="{{ form.answer_to_id.name }}" id="{{ form.answer_to_id.id_for_label }}" value="{{ c.pk }}">
+
+        <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+        {{ form.content }}
+        <button type="submit">Envoyer</button>
+    </form>
+
     {%if c.replies %}
         {% for r in c.replies.all %}
             {% include 'ideas/comment.html' with c=r %}
         {% endfor %}
     {% endif %}
 
-    <a href="" class="reply-link" onclick="toggleReplyForm(c.pk)">Répondre</a>
-
-    <div class="answer-form" id="comment-{{ c.pk }}">
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Ajouter un commentaire</button>
-        </form>
-    </div>
+    
 </div>
