@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ideas',
     'fontawesomefree',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bai.wsgi.application'
 
+LOGIN_URL = 'LoginUser'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

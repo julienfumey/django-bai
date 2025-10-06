@@ -11,15 +11,21 @@
         <title>{%block title%}{%endblock%} | BàI</title>
     </head>
     <body class="bg-lightgrey">
-        <nav class="navbar bg-darkblue border-bottom border-body" data-bs-theme="dark">
+        <nav class="navbar bg-darkblue border-bottom border-body mb-4" data-bs-theme="dark">
             <div class="container-fluid">
                 <h1 class="navbar-brand"><a href="{% url 'home' %}">La boîte à idées</a></h1>
+            
+                {% if user.is_authenticated %}
+                    <p class="text-lightgrey"><a href="">Modération des commentaires<a>&nbsp;|&nbsp;{{ user.get_full_name }}</p></a>
+                {% endif %}
             </div>
+
         </nav>
         
         
         
-        <main class="px-3">   
+        <main class="px-3">  
+
         {% block content %}
         {% endblock %}
         </main>

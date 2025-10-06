@@ -1,4 +1,5 @@
 {% extends "ideas/base.html" %}
+{% load ideas_extra %}
 
 {% block title %}Visualisation d'une idée{% endblock %}
 
@@ -9,11 +10,18 @@
         <h2>{{ idea.title }} <div class="badge rounded-pill text-bg-primary">{{ idea.get_status_display }}</div></h2>
 
         <div>Créée le {{ idea.created_at|date:'d M Y H:m:s' }}</div>
-        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ idea.comments.count }} | <a href="" class="upvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ idea.upvotes }}</a> | <a href="" class="downvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ idea.downvotes }}</a>&nbsp;|&nbsp;<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ idea.pk }}">Report</a></div>
+        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ idea.comments|get_count }} | <a href="" class="upvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ idea.upvotes }}</a> | <a href="" class="downvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ idea.downvotes }}</a>&nbsp;|&nbsp;<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ idea.pk }}">Report</a></div>
     </div>
 
     <div class="col-md-5">
-         </div>
+        {% if user.is_authenticated %}
+            <h4>Actions</h4>
+            {% if idea.status == 0 %}
+                <a href="{% url 'publish_idea' idea.pk %}" class="btn btn-success">Publish</a>
+            {% endif %}
+            <a href="" class="btn btn-danger">Supprimer</a>
+        {% endif %}
+    </div>
 </div>
 
 <div class="container-fluid vh-100">
@@ -25,9 +33,11 @@
 
         <div class="col-md-5 h-100 overflow-auto">
 
-            <h4>Commentaires ({{ idea.comments.count }})</h4>
+            <h4>Commentaires ({{ idea.comments|get_count }})</h4>
 
-            <button class="reply-btn" data-type="article">Répondre</button>
+            {% if idea.status == 1 %}
+                <button class="reply-btn" data-type="article">Répondre</button>
+            {% endif %}
 
             <form id="comment-form-ARTICLE" class="comment-form" method="POST">
                 {% csrf_token %}
@@ -38,7 +48,7 @@
 
             {% for comment in idea.comments.all %}
                 {% if not comment.answer_to %}
-                    {% include 'ideas/comment.html' with c=comment %}
+                    {% include 'ideas/comment.html' with c=comment i=idea %}
                 {% endif %}
             {% empty %}
                 Pas de commentaires pour le moment.

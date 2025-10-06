@@ -1,136 +1,33 @@
-{% extends "ideas/base.html" %}
+{% load ideas_extra %}
 
-{% block title %}Accueil{% endblock %}
-
-{% block content %}
 <div class="row">
-    <div class="col-md-3">
-        blablablabla
-        <a href="{% url 'idea_create' %}" class="btn btn-primary mb-3">
-            <i class="fa-solid fa-plus"></i> Ajouter une idée
-        </a>
-    </div>
-
-    <div class="col-md-9">
-        <div class="row">
-        {% for ideas in object_list %}
+    {% for ideas in object_list %}
+        {% if ideas.is_published or user.is_authenticated %}
             <div class="col-md-4">
                 <div class="card mt-3">
                     <div class="card-header">Idea #{{ ideas.pk }}</div>
                     
                     <div class="card-body">
-                        <div class="badge rounded-pill text-bg-primary">{{ ideas.get_status_display }}</div>
+                        {% if ideas.status == 0 %}
+                            <div class="badge rounded-pill text-bg-warning">{{ ideas.get_status_display }}</div>
+                        {% elif ideas.status == 1 %}
+                            <div class="badge rounded-pill text-bg-success">{{ ideas.get_status_display }}</div>
+                        {% elif ideas.status == 2 %}
+                            <div class="badge rounded-pill text-bg-danger">{{ ideas.get_status_display }}</div>
+                        {% endif %}
+                        
                         <h5 class="card-title"><a href="{% url 'idea_detail' pk=ideas.pk %}">{{ ideas.title }}</a></h5>
-                        <p>{{ ideas.description|truncatechars_html:100 }}</p>
+                        <p>{{ ideas.description|safe|truncatechars_html:100 }}</p>
                         <p><small class="text-muted">Created on {{ ideas.created_at }}</small></p>
                     </div>
                     <div class="card-footer justify-content-between d-flex">
-                        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments.count }} | <a href="" class="upvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }}</a> | <a href="" class="downvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}</a></div>
+                        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments|get_count }} | <a href="" class="upvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }}</a> | <a href="" class="downvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}</a></div>
                         <div><a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ ideas.pk }}">Report</a></div>
                     </div>
                 </div>
             </div>
-        {% empty %}
-            Pas d'idées pour le moment.
-        {% endfor %}
-    </div>
+        {% endif %}
+    {% empty %}
+        Pas d'idées pour le moment.
+    {% endfor %}
 </div>
-
-
-<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-    <form method="POST">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="reportModalLabel">Report an idea</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {% csrf_token %}
-                    <input type="hidden" name="{{ form.type_.name}}" id="{{ form.type_.id_for_label }}" value="">
-                    <input type="hidden" name="{{ form.id_.name }}" id="{{ form.id_.id_for_label }}" value="">
-                    
-                    <label for="{{ form.reason.id_for_label }}">Reason</label>
-                    {{ form.reason }}
-
-                    <label for="{{ form.comment.id_for_label }}">Details (optional)</label>
-                    {{ form.comment }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-grey" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-red">Send report</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-
-<script>
-
-    const reportModal = document.getElementById('reportModal')
-        if (reportModal) {
-        reportModal.addEventListener('show.bs.modal', event => {
-            // Button that triggered the modal
-            const button = event.relatedTarget
-            // Extract info from data-bs-* attributes
-            const type = button.getAttribute('data-bs-type')
-            const id = button.getAttribute('data-bs-id')
-
-            // Update the modal's content.
-            const modalTypeInput = reportModal.querySelector('#id_type_')
-            const modalIdInput = reportModal.querySelector('#id_id_')
-
-            modalTypeInput.value = type
-            modalIdInput.value = id
-        })
-    }
-
-    const upvotes = document.querySelectorAll('.upvote');
-
-    upvotes.forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            let ideaId = this.id;
-            console.log(ideaId);
-            fetch(`/idea/${ideaId}/up`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = "<i class=\"fa-solid fa-thumbs-up text-success\"></i> "+data.upvote;
-            });
-        });
-
-    });
-
-
-    const downvotes = document.querySelectorAll('.downvote');
-
-    downvotes.forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            let ideaId = this.id;
-            console.log(ideaId);
-            fetch(`/idea/${ideaId}/down`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = "<i class=\"fa-solid fa-thumbs-down text-danger\"></i> "+data.downvote;
-            });
-        });
-
-    });
-</script>
-
-{% endblock%}

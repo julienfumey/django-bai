@@ -1,0 +1,24 @@
+<h5 class="mt-4">Comments review</h5>
+<div class="list-group">
+    {% for comment in comments_to_moderate %}
+        <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">Comment #{{ comment.pk }} on <a href="{% url 'idea_detail' pk=comment.idea.pk %}">{{ comment.idea.title }}</a></h6>
+                <small>Posted on {{ comment.created_at }}</small>
+            </div>
+            <p class="mb-1">{{ comment.content }}</p>
+            <div class="mt-2">
+                <form method="POST" action="{% url 'approve_comment' pk=comment.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                </form>
+                <form method="POST" action="{% url 'reject_comment' pk=comment.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                </form>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">No comments to moderate.</p>
+    {% endfor %}
+</div>

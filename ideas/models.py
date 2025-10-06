@@ -6,8 +6,9 @@ from django.urls import reverse
 # Create your models here.
 
 STATUSES = [
-    (0, 'New'),
-    (1, 'Answered'),
+    (0, 'Not published'),
+    (1, 'Published'),
+    (2, 'Answered'),
 ]
 
 
@@ -63,6 +64,14 @@ class Idea(models.Model):
         else:
             pass
 
+    def publish(self):
+        self.status = 1
+        self.save()
+
+    @property
+    def is_published(self):
+        return self.status in [1, 2]
+
     @login_required
     def mark_as_answered(self, answer_text):
         self.answer = answer_text
@@ -99,6 +108,10 @@ class Comment(models.Model):
     signal = models.BooleanField(
         default=False,
     )
+    status = models.IntegerField(
+        choices=STATUSES,
+        default=0,
+    )
 
     def __str__(self):
         return f'Comment on {self.idea.title} by {self.created_at}'
@@ -118,3 +131,15 @@ class Comment(models.Model):
             self.save()
         else:
             pass
+
+    def publish(self):
+        self.status = 1
+        self.save()
+
+    def reject(self):
+        self.status = 2
+        self.save()
+
+    @property
+    def is_published(self):
+        return self.status == 1

@@ -1,0 +1,151 @@
+{% extends "ideas/base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        blablablabla
+        <a href="{% url 'idea_create' %}" class="btn btn-primary mb-3">
+            <i class="fa-solid fa-plus"></i> Ajouter une idée
+        </a>
+    </div>
+
+    <div class="col-md-9">
+        <form id="filters" method="GET">
+            {{ filter.form.status }}
+        </form>
+        <ul class="pagination justify-content-end">
+            {% for page_num in paginator.page_range %}
+                <li class="page-item {% if page_num == paginator.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div id="ideas_list">
+            {% include 'ideas/idea_list.html' %}
+        </div>
+
+        {% if user.is_authenticated %}
+            {% include 'ideas/comment_moderation.html' %}
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <form method="POST">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="reportModalLabel">Report an idea</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="{{ form.type_.name}}" id="{{ form.type_.id_for_label }}" value="">
+                    <input type="hidden" name="{{ form.id_.name }}" id="{{ form.id_.id_for_label }}" value="">
+                    
+                    <label for="{{ form.reason.id_for_label }}">Reason</label>
+                    {{ form.reason }}
+
+                    <label for="{{ form.comment.id_for_label }}">Details (optional)</label>
+                    {{ form.comment }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-grey" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-red">Send report</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("filters");
+        const container = document.getElementById("ideas_list");
+        form.addEventListener("change", function() {
+            const params = new URLSearchParams(new FormData(form));
+            fetch(`${window.location.pathname}?${params}`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                container.innerHTML = data.html;
+            });
+        });
+        });
+
+
+    const reportModal = document.getElementById('reportModal')
+        if (reportModal) {
+        reportModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget
+            // Extract info from data-bs-* attributes
+            const type = button.getAttribute('data-bs-type')
+            const id = button.getAttribute('data-bs-id')
+
+            // Update the modal's content.
+            const modalTypeInput = reportModal.querySelector('#id_type_')
+            const modalIdInput = reportModal.querySelector('#id_id_')
+
+            modalTypeInput.value = type
+            modalIdInput.value = id
+        })
+    }
+
+    const upvotes = document.querySelectorAll('.upvote');
+
+    upvotes.forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ideaId = this.id;
+            console.log(ideaId);
+            fetch(`/idea/${ideaId}/up`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = "<i class=\"fa-solid fa-thumbs-up text-success\"></i> "+data.upvote;
+            });
+        });
+
+    });
+
+
+    const downvotes = document.querySelectorAll('.downvote');
+
+    downvotes.forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ideaId = this.id;
+            console.log(ideaId);
+            fetch(`/idea/${ideaId}/down`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = "<i class=\"fa-solid fa-thumbs-down text-danger\"></i> "+data.downvote;
+            });
+        });
+
+    });
+</script>
+
+{% endblock%}
