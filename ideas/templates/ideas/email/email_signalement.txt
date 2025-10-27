@@ -3,12 +3,16 @@ Bonjour,
 
 Un signalement a été effectué sur la boîte à idées.
 
-Le signalement concerne {% if type_objet == "Comment" %}un commentaire{% else %}une idée{% endif %} :
+Le signalement concerne {{ type_object }} suivant :
 Identifiant : {{ object.pk }}
 Adresse : {{ object.get_absolute_url }}
 
 Raison du signalement : {{ reason }}
 Commentaire (optionnel) : {{ commentaire }}
+
+
+Texte signalé :
+{{ object.content }}
 
 Ce mail a été envoyé automatiquement par le système de la boîte à idées. Merci de ne pas y répondre.
 

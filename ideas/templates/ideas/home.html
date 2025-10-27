@@ -1,4 +1,5 @@
 {% extends "ideas/base.html" %}
+{% load static %}
 
 {% block title %}Accueil{% endblock %}
 
@@ -100,52 +101,10 @@
         })
     }
 
-    const upvotes = document.querySelectorAll('.upvote');
-
-    upvotes.forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            let ideaId = this.id;
-            console.log(ideaId);
-            fetch(`/idea/${ideaId}/up`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = "<i class=\"fa-solid fa-thumbs-up text-success\"></i> "+data.upvote;
-            });
-        });
-
-    });
-
-
-    const downvotes = document.querySelectorAll('.downvote');
-
-    downvotes.forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            let ideaId = this.id;
-            console.log(ideaId);
-            fetch(`/idea/${ideaId}/down`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = "<i class=\"fa-solid fa-thumbs-down text-danger\"></i> "+data.downvote;
-            });
-        });
-
-    });
+    const CSRF_TOKEN = "{{ csrf_token }}";
 </script>
+
+<script src="{% static 'comment_votes.js' %}"></script>
+
 
 {% endblock%}

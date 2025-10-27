@@ -72,6 +72,10 @@ class Idea(models.Model):
     def is_published(self):
         return self.status in [1, 2]
 
+    @property
+    def is_reported(self):
+        return self.signal
+
     @login_required
     def mark_as_answered(self, answer_text):
         self.answer = answer_text
@@ -143,3 +147,7 @@ class Comment(models.Model):
     @property
     def is_published(self):
         return self.status == 1
+
+    @property
+    def is_reported(self):
+        return self.signal

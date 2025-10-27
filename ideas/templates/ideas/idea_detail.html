@@ -1,5 +1,6 @@
 {% extends "ideas/base.html" %}
 {% load ideas_extra %}
+{% load static %}
 
 {% block title %}Visualisation d'une idée{% endblock %}
 
@@ -10,7 +11,7 @@
         <h2>{{ idea.title }} <div class="badge rounded-pill text-bg-primary">{{ idea.get_status_display }}</div></h2>
 
         <div>Créée le {{ idea.created_at|date:'d M Y H:m:s' }}</div>
-        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ idea.comments|get_count }} | <a href="" class="upvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ idea.upvotes }}</a> | <a href="" class="downvote" id="{{idea.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ idea.downvotes }}</a>&nbsp;|&nbsp;<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ idea.pk }}">Report</a></div>
+        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ idea.comments|get_count }} | <a href="" class="upvote" id="{{idea.pk}}" type="idea"><i class="fa-solid fa-thumbs-up text-success"></i> {{ idea.upvotes }}</a> | <a href="" class="downvote" id="{{idea.pk}}" type="idea"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ idea.downvotes }}</a>&nbsp;|&nbsp;{% if not idea.is_reported %}<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea" data-bs-id="{{ idea.pk }}">Report</a>{% else %}Already reported{% endif %}</div>
     </div>
 
     <div class="col-md-5">
@@ -98,6 +99,24 @@
             });
         });
 
+        const reportModal = document.getElementById('reportModal')
+        if (reportModal) {
+        reportModal.addEventListener('show.bs.modal', event => {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            const type = button.getAttribute('data-bs-type');
+            const id = button.getAttribute('data-bs-id');
+
+            // Update the modal's content.
+            const modalTypeInput = reportModal.querySelector('#id_type_');
+            const modalIdInput = reportModal.querySelector('#id_id_');
+
+            modalTypeInput.value = type;
+            modalIdInput.value = id;
+        })
+    }
+
         const forms = document.querySelectorAll(".comment-form");
         forms.forEach(f => f.style.display = "none"); // On cache le formulaire au départ
 
@@ -131,54 +150,11 @@
                 this.style.height = this.scrollHeight + "px";
             });
         });
-    });
+    });    
 
-    const upvotes = document.querySelectorAll('.upvote');
-
-    upvotes.forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            let ideaId = this.id;
-            console.log(ideaId);
-            fetch(`/comment/${ideaId}/up`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = "<i class=\"fa-solid fa-thumbs-up text-success\"></i> "+data.upvote;
-            });
-        });
-
-    });
-
-
-    const downvotes = document.querySelectorAll('.downvote');
-
-    downvotes.forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            let ideaId = this.id;
-            console.log(ideaId);
-            fetch(`/comment/${ideaId}/down`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = "<i class=\"fa-solid fa-thumbs-down text-danger\"></i> "+data.downvote;
-            });
-        });
-
-    });
+    const CSRF_TOKEN = "{{ csrf_token }}";
 </script>
+
+<script src="{% static 'comment_votes.js' %}"></script>
 
 {% endblock %}

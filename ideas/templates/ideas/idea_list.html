@@ -21,8 +21,8 @@
                         <p><small class="text-muted">Created on {{ ideas.created_at }}</small></p>
                     </div>
                     <div class="card-footer justify-content-between d-flex">
-                        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments|get_count }} | <a href="" class="upvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }}</a> | <a href="" class="downvote" id="{{ideas.pk}}"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}</a></div>
-                        <div><a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ ideas.pk }}">Report</a></div>
+                        <div><i class="fa-solid fa-comment"></i>&nbsp;{{ ideas.comments|get_count }} | <a href="" class="upvote" id="{{ideas.pk}}" type="idea"><i class="fa-solid fa-thumbs-up text-success"></i> {{ ideas.upvotes }}</a> | <a href="" class="downvote" id="{{ideas.pk}}" type="idea"><i class="fa-solid fa-thumbs-down text-danger"></i> {{ ideas.downvotes }}</a></div>
+                        <div>{% if not ideas.is_reported %}<a type="button" class="text-red" data-bs-toggle="modal" data-bs-target="#reportModal" data-bs-type="idea"data-bs-id="{{ ideas.pk }}">Report</a>{% else %}Already reported{% endif %}</div>
                     </div>
                 </div>
             </div>

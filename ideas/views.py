@@ -42,7 +42,6 @@ class IdeaListView(FilterView):
             type_ = form.cleaned_data['type_']
             id_ = form.cleaned_data['id_']
             if type_ == 'idea':
-                print("toto")
                 idea = models.Idea.objects.get(pk=id_)
                 idea.signaler(reason, commentaire)
             elif type_ == 'comment':
@@ -118,7 +117,7 @@ class IdeaDetailView(DetailView):
                 type_ = report_form.cleaned_data['type_']
                 id_ = report_form.cleaned_data['id_']
                 if type_ == 'idea':
-                    print("toto")
+                    print(f"toto {id_}")
                     idea = models.Idea.objects.get(pk=id_)
                     idea.signaler(reason, commentaire)
                 elif type_ == 'comment':

@@ -6,12 +6,19 @@ from django.conf import settings
 def send_mail_signalement(object, reason, commentaire):
 
     type_object = object.__class__.__name__
+    print(type_object)
     context = {
         'object': object,
-        'type_object': type_object,
         'reason': reason,
         'commentaire': commentaire,
     }
+
+    if type_object == 'Idea':
+        context['type_object'] = "l'idée"
+        context['content'] = object.description
+    elif type_object == 'Comment':
+        context['type_object'] = 'le commentaire'
+        context['content'] = object.content
 
     mailcontent = render_to_string('ideas/email/email_signalement.txt', context)  # plaintext.render(d)
 
