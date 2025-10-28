@@ -3,7 +3,7 @@ from .models import Idea, STATUSES
 
 
 class IdeaFilter(django_filters.FilterSet):
-    status = django_filters.ChoiceFilter(label='Status')
+    status = django_filters.ChoiceFilter(label='Status', choices=STATUSES)
     order = django_filters.OrderingFilter(
         fields=(
             ('status', 'status'),
@@ -23,6 +23,7 @@ class IdeaFilter(django_filters.FilterSet):
         model = Idea
         fields = ['status', 'order']
 
+    """
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('request').user
         super().__init__(*args, **kwargs)
@@ -31,3 +32,19 @@ class IdeaFilter(django_filters.FilterSet):
             self.filters["status"].extra["choices"] = [choice for choice in STATUSES if choice[0] != 0]
         else:
             self.filters["status"].extra["choices"] = STATUSES
+    """
+
+    """
+    def filter_queryset(self, queryset):
+        # Ajout d'une annotation pour l'ordre personnalisé
+        queryset = queryset.annotate(
+            status_order=Case(
+                When(status=0, then=0),
+                When(status=1, then=1),
+                When(status=2, then=2),
+                default=99,
+                output_field=IntegerField()
+            )
+        )
+        return super().filter_queryset(queryset)
+    """

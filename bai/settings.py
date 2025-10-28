@@ -15,18 +15,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from bai.localsettings import *
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-is14012kt&u4)d2@m&vand%s_w8^rl*hhl$-_47f65cv3=@l_f'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -37,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'ideas',
     'fontawesomefree',
     'django_filters',
@@ -69,6 +63,8 @@ TEMPLATES = [
         },
     },
 ]
+
+SITE_ID = 1
 
 WSGI_APPLICATION = 'bai.wsgi.application'
 
@@ -128,7 +124,3 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-REPORT_EMAIL = '<EMAIL_ADDRESS>'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -1,5 +1,5 @@
 from django.db import models
-from .utils import send_mail_signalement
+from .utils import send_mail_signalement, send_mail_new_idea
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
@@ -44,6 +44,13 @@ class Idea(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            super().save(*args, **kwargs)
+            send_mail_new_idea(self)
+        else:
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('idea_detail', args=[str(self.pk)])

@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
 from django.contrib.auth.views import LoginView
@@ -17,19 +18,28 @@ from .filters import IdeaFilter
 
 
 # Create your views here.
-class IdeaListView(FilterView):
+class IdeaListView(ListView):
     model = models.Idea
     # queryset = models.Idea.objects.filter(status__in=[1,2]).order_by('-created_at')
     filterset_class = IdeaFilter
     template_name = 'ideas/home.html'
     form_class = forms.ReportForm
     ordering = ['-created_at']
-    paginate_by = 9
+    # paginate_by = 9
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            qs = models.Idea.objects.all()
+        else:
+            qs = models.Idea.objects.filter(status__in=[1, 2])
+
+        self.filterset = IdeaFilter(self.request.GET, queryset=qs)
+        return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = self.form_class
-
+        context["filter"] = self.filterset
         if self.request.user:
             context["comments_to_moderate"] = models.Comment.objects.filter(status=0)
         return context

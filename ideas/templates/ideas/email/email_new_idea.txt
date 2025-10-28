@@ -1,0 +1,12 @@
+{% autoescape off %}
+Bonjour,
+
+Une nouvelle idée a été soumise dans la boîte à idées.
+
+Titre de l'idée : {{ idea.title }}
+Identifiant : {{ idea.pk }}
+
+Adresse : {{ url }}
+
+Cette idée n'est pas visible publiquement tant qu'elle n'a pas été validée par un modérateur.
+{% endautoescape %}
