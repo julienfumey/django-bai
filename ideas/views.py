@@ -145,6 +145,12 @@ def publishIdea(request, pk):
     idea.publish()
     return redirect('idea_detail', pk=pk)
 
+@login_required
+def deleteIdea(request, pk):
+    idea = models.Idea.objects.get(pk=pk)
+    idea.delete()
+    return redirect('home')
+
 
 class IdeaCreateView(CreateView):
     model = models.Idea

@@ -8,6 +8,7 @@ urlpatterns = [
     path('idea/<pk>/up', idea_upvote, name="idea_upvote"),
     path('idea/<pk>/down', idea_downvote, name="idea_downvote"),
     path('idea/<pk>/publish', publishIdea, name="publish_idea"),
+    path('idea/<pk>/delete', deleteIdea, name="poubelle_idea"),
     path('comment/<pk>/up', comment_upvote, name="comment_upvote"),
     path('comment/<pk>/down', comment_downvote, name="comment_downvote"),
     path('comment/<pk>/publish', approve_comment, name="approve_comment"),

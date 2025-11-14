@@ -9,6 +9,7 @@ STATUSES = [
     (0, 'Not published'),
     (1, 'Published'),
     (2, 'Answered'),
+    (3,"deleted"),
 ]
 
 
@@ -52,6 +53,10 @@ class Idea(models.Model):
         else:
             super().save(*args, **kwargs)
 
+    def delete(self):
+        self.status=3
+        self.save()
+        
     def get_absolute_url(self):
         return reverse('idea_detail', args=[str(self.pk)])
 

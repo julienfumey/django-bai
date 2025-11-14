@@ -20,7 +20,7 @@
             {% if idea.status == 0 %}
                 <a href="{% url 'publish_idea' idea.pk %}" class="btn btn-success">Publish</a>
             {% endif %}
-            <a href="" class="btn btn-danger">Supprimer</a>
+            <a href="{% url 'poubelle_idea' idea.pk %}" class="btn btn-danger">Supprimer</a>
         {% endif %}
     </div>
 </div>

@@ -124,3 +124,27 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'Simple_Format': {
+            'format': '=== {asctime} {levelname} in {module} ===\n{message}\n=============================',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level':'ERROR',
+            'class':'logging.FileHandler',
+            'filename':'./logs/error.log',
+            'formatter':'Simple_Format',
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'ERROR',
+    },
+}
